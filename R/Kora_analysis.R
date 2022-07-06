@@ -3,6 +3,7 @@ library(patchwork)
 library(splines)
 library(broom)
 library(openxlsx)
+library(tableone)
 
 df1 <- readRDS("Data/KORA_data_formatted.RDS")
 
@@ -64,18 +65,36 @@ nrow(df1)
 # How many had lead levels measurements ?
 nrow(df1[ !is.na(df1$pb2020), ])
 
-
-
-# summary tables of lead by demographic variables
+##### Summary table of cohort characteristics
 catvars_tab1 <- c("sex", "age_cat", "bmi_whocat",
-             "smok_cat5", "etoh_cat", "physact_cat",
-             "educ_level", "prof_cat", "currentwork_status",
-             "income_helmert", "soc_class_helmert_cat",
-             "health_ins")
+                  "smok_cat5", "etoh_cat", "physact_cat",
+                  "educ_level", "prof_cat", "currentwork_status",
+                  "income_helmert", "soc_class_helmert_cat",
+                  "health_ins")
+df1$leadmeasured2020 <- ifelse(!is.na(df1$pb2020), "Yes", "No")
+df1$leadmeasured1988 <- ifelse(!is.na(df1$pb1988), "Yes", "No")
+
+vars_cohort_describe <- c(catvars_tab1[catvars_tab1!="sex" ], "leadmeasured2020", "leadmeasured1988")
+cohort_descriptives <- CreateTableOne(vars = vars_cohort_describe,
+                                      factorVars = catvars_tab1,
+                                      includeNA = TRUE, data = df1, strata = "sex",
+                                      test = FALSE)
+write.csv(print(cohort_descriptives, quote = FALSE),
+          "Results/tableS1_cohort_descriptives.csv", row.names = TRUE)
 
 
+
+
+
+
+
+
+
+
+##### summary tables of lead by demographic variables #####
 # define quantiles for summary data
 quants <- c(0.05, 0.10, 0.25, 0.5, 0.75, 0.90, 0.95)
+
 
 
 data_quantiles <- lapply(1:length(catvars_tab1 ), function(i){
@@ -125,7 +144,7 @@ table1[ table1$strata== "Male" & !is.na(table1$strata), ]$geomean /
 # How many individuals had BLLs over reference levels ?
 #  For women 30 is German Federal Environmental Agency proposed limit
 table(df1$pb2020 > 30, df1$sex, useNA = "ifany")
-#  For women 40 is German Federal Environmental Agency proposed limit
+#  For men 40 is German Federal Environmental Agency proposed limit
 table(df1$pb2020 > 40, df1$sex, useNA = "ifany")
 # For CDC 50 is limit regardless of gender
 table(df1$pb2020 > 50, useNA = "ifany")
@@ -162,7 +181,7 @@ table1_by_sex <- left_join (sex_means, sex_quantiles ) %>%
     arrange(var, sex)
 write.csv(table1_by_sex, "Results/table1_by_sex.csv", row.names = FALSE)
 
-
+# Note that summary data in table1 here is used in tables 1 and 2 of paper
 
 # Anova tests for key variables
 summary(aov(pb2020 ~ sex, df1))
@@ -176,6 +195,35 @@ summary(aov(pb2020 ~ bmi, df1))
 summary(aov(pb2020 ~ etoh_g_day, df1))
 
 
+
+### Box plots for paper table 2 variables - education level, professional category, household income
+boxplot1 <- ggplot(df1 %>% filter(!is.na(educ_level)), aes(x = educ_level, y = pb2020)) +
+    geom_boxplot() + coord_flip() + 
+    ylab("Blood lead level μg/L") + xlab("") +
+    ggtitle("Blood lead levels by education level") +
+    theme_apply_sm
+boxplot2 <- ggplot(df1 %>% filter(!is.na(prof_cat)), aes(x = prof_cat, y = pb2020)) +
+    geom_boxplot() + coord_flip() + 
+    ylab("Blood lead level μg/L") + xlab("") +
+    ggtitle("Blood lead levels by professional category") +
+    theme_apply_sm
+boxplot3 <- ggplot(df1 %>% filter(!is.na(income_helmert)), aes(x = income_helmert, y = pb2020)) +
+    geom_boxplot() + coord_flip() + 
+    ylab("Blood lead level μg/L") + xlab("") +
+    ggtitle("Blood lead levels by Helmert income category") +
+    theme_apply_sm
+
+tiff("Graphs/FigS2_boxplot_education.tiff")
+    boxplot1
+dev.off()
+
+tiff("Graphs/FigS3_boxplot_profcat.tiff")
+    boxplot2
+dev.off()
+
+tiff("Graphs/FigS4_boxplot_helmert.tiff")
+    boxplot3
+dev.off()
 
 
 
@@ -204,7 +252,7 @@ g2 <- ggplot(df1, aes(x = log(etoh_g_day), y=log(pb2020))) + geom_point() +
     ggtitle("Log blood lead levels vs log alcohol consumption") +
     theme_apply
 
-tiff("Graphs/Figure1.tiff", width=1200, height=900)
+tiff("Graphs/Fig3_BLLvsEtoH.tiff", width=1200, height=900)
     print(g1 + g2 + plot_layout(guides="collect"))
 dev.off()
 
@@ -245,7 +293,7 @@ g_beer <-  ggplot(df1, aes(x = log(beer_g_day), y=log(pb2020))) + geom_point() +
     ggtitle("Beer", ) +
     theme_apply_sm
 
-tiff("Graphs/Figure2.tiff", width=1200, height=900)
+tiff("Graphs/Fig4_BLLvs_typeEToH.tiff", width=1200, height=900)
     g_spirits + g_wine + g_beer + plot_layout(guides="collect")
 dev.off()
 
@@ -262,7 +310,7 @@ g_wine_sex <-  ggplot(df1, aes(x = log(wine_g_day), y=log(pb2020))) + geom_point
     ggtitle("Wine") +
     theme_apply_sm + facet_wrap(~sex)
 
-tiff("Graphs/FigureS1.tiff", width=1200, height=900)
+tiff("Graphs/FigS1_BLL_vs_wineXsex.tiff", width=1200, height=900)
     g_wine_sex
 dev.off()
 
@@ -391,8 +439,8 @@ table3$strata...7 <- NULL
 table3 <- table3 %>% arrange(strata...2, year...1)
 write.csv(table3, "Results/table3.csv", row.names = FALSE)
 
-# %change of GM means
-data_means2020$geomean / data_means1988$geomean
+# difference of GM means between periods
+data_means1988$geomean - data_means2020$geomean
 
 # The limit of detection in 1988 < lod in 2020
 # How many were below lod in 1988 (these have value 0 in the data)
@@ -419,8 +467,17 @@ g_change <- ggplot( dflong %>% filter(name == "pb2020" |
     xlab("Year of measurement") + ylab("Blood Pb ng/L") +
     theme_apply_change
 
-tiff("Graphs/Figure3.tiff", width=800, height=600)
+tiff("Graphs/Fig6_individualchange.tiff", width=800, height=600)
     g_change
+dev.off()
+
+
+# Boxplot by gender over time periods
+g_box_delta <- ggplot(dflong, aes(x = BLL, col = sex)) + geom_boxplot() +
+    facet_wrap(~BLL_year) + coord_flip() + theme_apply
+
+tiff("Graphs/Fig5_change_by_sex_boxplot.tiff", width=800, height=600)
+    g_box_delta
 dev.off()
 
 
@@ -428,22 +485,30 @@ dev.off()
 
 
 #### Linear regression models for exogenous variables using pb2020 as outcome ####
-mod_etoh_smok <- lm(pb2020 ~ etoh_g_day + smok_cat5 + sex + age_at_survey + bmi +
-                        educ_level + smok_cat5, df1)
+#mod_etoh_smok <- lm(pb2020 ~ etoh_g_day + smok_cat5 + sex + age_at_survey + bmi +
+#                        educ_level + smok_cat5, df1)
 
+mod_etoh_smok_male <- lm(pb2020 ~ etoh_g_day + smok_cat5 + age_at_survey + bmi +
+       educ_level + smok_cat5, df1 %>% filter(sex == "Male"))
+mod_etoh_smok_female <- lm(pb2020 ~ etoh_g_day + smok_cat5 + age_at_survey + bmi +
+       educ_level + smok_cat5, df1 %>% filter(sex == "Female"))
 
 # gather model statistics
-modstats <- data.frame(c(model = "Etoh_and_smoking", glance(mod_etoh_smok)))
+modstats <- data.frame(rbind(
+    cbind(model = "Males", glance(mod_etoh_smok_male)),
+    cbind(model = "Females", glance(mod_etoh_smok_female))))
 
-modresults <- data.frame( cbind(model = "Etoh_and_smoking", tidy(mod_etoh_smok, conf.int = TRUE)))
+modresults <- data.frame( rbind(
+    cbind(model = "Males", tidy(mod_etoh_smok_male, conf.int = TRUE)),
+    cbind(model = "Females", tidy(mod_etoh_smok_female, conf.int = TRUE))))
 
 # write to file
 wb <- createWorkbook()
 addWorksheet(wb, sheetName = "Model Summaries")
 writeData(wb, "Model Summaries", modstats)
 
-addWorksheet(wb, sheetName = "Model Estimates")
-writeData(wb, "Model Estimates", modresults)
+addWorksheet(wb, sheetName = "Parameter Estimates")
+writeData(wb, "Parameter Estimates", modresults)
 
 saveWorkbook(wb, "Results/model_results.xlsx", overwrite = TRUE)
 

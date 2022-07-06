@@ -86,7 +86,7 @@ df1$educ_level <- factor(case_when(df1$educ_level == 0 ~ "Did not finish",
                                    df1$educ_level == 3 ~ "Vocational school / apprenticeship",
                                    df1$educ_level == 4 ~ "Secondary school / Middle school",
                                    df1$educ_level == 5 ~ "Technical college / technician / master",
-                                   df1$educ_level == 6 ~ "Abitur",
+                                   df1$educ_level == 7 ~ "Abitur",
                                    df1$educ_level == 9 ~ "University"),
                          levels = c("Did not finish", "Secondary school",
                                     "Vocational school / apprenticeship",
@@ -149,7 +149,7 @@ df1$bmi_whocat <- factor( case_when(df1$bmi_whocat == 1 ~ "Underweight (< 18.5 k
                                     df1$bmi_whocat == 4 ~ "Obese, grade 1 (≥ 30 to <35 kg/m2)",
                                     df1$bmi_whocat == 5 ~ "Obese, grade 2 (≥ 35 to <40 kg/m2)",
                                     df1$bmi_whocat == 6 ~ "Obese, grade 3 (≥ 40 kg/m2)"),
-                          levels = c("Underweight (< 18.5 kg/m2)", "Normal weight (≥ 18.5 to <2 5 kg/m2)",
+                          levels = c("Underweight (< 18.5 kg/m2)", "Normal weight (≥ 18.5 to <25 kg/m2)",
                                      "Pre-obese (≥ 25 to < 30 kg/m2)", "Obese, grade 1 (≥ 30 to <35 kg/m2)",
                                      "Obese, grade 2 (≥ 35 to <40 kg/m2)", "Obese, grade 3 (≥ 40 kg/m2)" ))
 
