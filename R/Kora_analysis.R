@@ -474,7 +474,15 @@ dev.off()
 
 # Boxplot by gender over time periods
 g_box_delta <- ggplot(dflong, aes(x = BLL, col = sex)) + geom_boxplot() +
-    facet_wrap(~BLL_year) + coord_flip() + theme_apply
+    facet_wrap(~BLL_year) + coord_flip() + 
+    theme_minimal() + xlab("Blood Pb ng/L") +
+    theme(plot.title = element_text(size=14, face="bold", hjust = 0.5),
+          legend.title = element_text(size=16, face="bold"),
+          axis.title.x = element_blank(),
+          axis.title.y = element_text(size=18),
+          axis.text.x = element_blank(),
+          axis.text.y = element_text(size=15, face="bold"),
+          strip.text.x = element_text(size = 15, face = "bold"))
 
 tiff("Graphs/Fig5_change_by_sex_boxplot.tiff", width=800, height=600)
     g_box_delta
