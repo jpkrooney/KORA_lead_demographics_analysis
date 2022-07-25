@@ -99,6 +99,7 @@ quants <- c(0.05, 0.10, 0.25, 0.5, 0.75, 0.90, 0.95)
 
 data_quantiles <- lapply(1:length(catvars_tab1 ), function(i){
     df1 %>% 
+        filter(!is.na(pb2020)) %>% 
         group_by(!!sym(catvars_tab1 [i])) %>%  
         summarise(enframe(quantile(pb2020, quants,
                                    na.rm=TRUE), "quantile", "pb")) %>% 
@@ -110,6 +111,7 @@ data_quantiles <- do.call("rbind", data_quantiles)
 
 data_means <- lapply(1:length(catvars_tab1 ), function(i){
     df1 %>% 
+        filter(!is.na(pb2020)) %>% 
         group_by(!!sym(catvars_tab1 [i])) %>%  
         summarise(n = n(),
                   armean = mean(pb2020, na.rm=TRUE),
@@ -122,10 +124,12 @@ data_means <- do.call("rbind", data_means)
 
 #Overall summary
 alldata_quantiles <- df1 %>%
+    filter(!is.na(pb2020)) %>% 
     summarise(enframe(quantile(pb2020, quants,
                                    na.rm=TRUE), "quantile", "pb")) %>% 
     pivot_wider(names_from = quantile, values_from = pb, names_prefix = "P")
 alldata_means <- df1 %>% 
+    filter(!is.na(pb2020)) %>% 
     summarise(n = n(),
                   armean = mean(pb2020, na.rm=TRUE),
                   geomean = gm_mean(pb2020, na.rm=TRUE))
@@ -154,6 +158,7 @@ table(df1$pb2020 > 50, useNA = "ifany")
 sex_quantiles <- lapply(1:length(catvars_tab1 ), function(i){
     if( catvars_tab1[i] != "sex"){ 
         df1 %>% 
+            filter(!is.na(pb2020)) %>% 
             group_by(!!sym(catvars_tab1 [i]), sex) %>%  
             summarise(enframe(quantile(pb2020, quants,
                                        na.rm=TRUE), "quantile", "pb")) %>% 
@@ -167,6 +172,7 @@ sex_quantiles <- do.call("rbind", sex_quantiles)
 sex_means <- lapply(1:length(catvars_tab1 ), function(i){
     if( catvars_tab1[i] != "sex"){ 
         df1 %>% 
+            filter(!is.na(pb2020)) %>% 
             group_by(!!sym(catvars_tab1 [i]), sex) %>%  
             summarise(n = n(),
                       armean = mean(pb2020, na.rm=TRUE),
@@ -256,6 +262,10 @@ tiff("Graphs/Fig3_BLLvsEtoH.tiff", width=1200, height=900)
     print(g1 + g2 + plot_layout(guides="collect"))
 dev.off()
 
+# correlations for reviewer 2
+cor(df1$bmi, log(df1$pb2020), use = "complete.obs")
+cor(df1$etoh_g_day, df1$pb2020, use = "complete.obs")
+
 # Draw similar graphs for alcohol subtypes
 g_spirits <-  ggplot(df1, aes(x = log(spirits_g_day), y=log(pb2020))) + geom_point() +
     geom_quantile(quantiles = 0.1, formula=y ~ ns(x, 2), aes(col="10%, 90%"), size=1.25) +
@@ -296,6 +306,12 @@ g_beer <-  ggplot(df1, aes(x = log(beer_g_day), y=log(pb2020))) + geom_point() +
 tiff("Graphs/Fig4_BLLvs_typeEToH.tiff", width=1200, height=900)
     g_spirits + g_wine + g_beer + plot_layout(guides="collect")
 dev.off()
+
+# correlations for reviewer 2
+cor(df1$spirits_g_day, df1$pb2020, use = "complete.obs")
+cor(df1$wine_g_day, df1$pb2020, use = "complete.obs")
+cor(df1$beer_g_day, df1$pb2020, use = "complete.obs")
+
 
 # Plot sex stratified graph of wine consumption
 g_wine_sex <-  ggplot(df1, aes(x = log(wine_g_day), y=log(pb2020))) + geom_point() +
