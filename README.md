@@ -7,12 +7,12 @@ Authors: James PK Rooney<sup>1,2,¶</sup>, Stefan Rakete<sup>2,¶</sup>, Margit 
 
 Affiliations:
 
-1 Academic Unit of Neurology, Trinity Biomedical Sciences Institute, Trinity College Dublin Ireland
-2 Institute and Clinic for Occupational-, Social- and Environmental Medicine, University Hospital, LMU Munich, Germany
-3 Institute of Epidemiology, Helmholtz Zentrum München, German Research Center for Environmental Health (GmbH), Neuherberg, Germany.
-4 KORA Study Centre, University Hospital of Augsburg, Augsburg, Germany
-5 Institute of Health Economics and Health Care Management, Helmholtz Zentrum München, German Research Center for Environmental Health (GmbH), Neuherberg, Germany
-6 Department of Economics, Martin Luther University Halle-Wittenberg, Halle (Saale), Germany
-7 Institute for Medical Information Processing, Biometry and Epidemiology, Ludwig-Maximilians-Universität München, Munich, Germany.
+1. Academic Unit of Neurology, Trinity Biomedical Sciences Institute, Trinity College Dublin Ireland
+2. Institute and Clinic for Occupational-, Social- and Environmental Medicine, University Hospital, LMU Munich, Germany
+3. Institute of Epidemiology, Helmholtz Zentrum München, German Research Center for Environmental Health (GmbH), Neuherberg, Germany.
+4. KORA Study Centre, University Hospital of Augsburg, Augsburg, Germany
+5. Institute of Health Economics and Health Care Management, Helmholtz Zentrum München, German Research Center for Environmental Health (GmbH), Neuherberg, Germany
+6. Department of Economics, Martin Luther University Halle-Wittenberg, Halle (Saale), Germany
+7. Institute for Medical Information Processing, Biometry and Epidemiology, Ludwig-Maximilians-Universität München, Munich, Germany.
 
-¶ joint first authors
+<sup>¶</sup> joint first authors
