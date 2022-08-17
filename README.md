@@ -1,4 +1,4 @@
-This repo contains the RMarkdown analysis file and subsequent output files for the paper:
+This repo contains the RMarkdown analysis file and subsequent output files for the manuscript titled:
 
 ### Blood lead levels in 2018/2019 compared to 1987/1988 in the German population-based KORA study
 
